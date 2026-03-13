@@ -1,4 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { supabase } from "./supabase";
+
+const CARD_ID = "main"; // single shared card
 
 const PHIL_DEFAULT = "/phil.jpeg";
 const MALOY_DEFAULT = "/maloy.jpeg";
@@ -22,37 +25,37 @@ const DEFAULT_DATA = {
     photo: MALOY_DEFAULT,
   },
   rows: [
-        {
+    {
       topic: "Spending",
       left: { text: "Will demand real cuts, not cosmetic ones. Utah\u2019s 3rd District cannot afford trillion-dollar deficits passed down to our children and grandchildren.", bold: "real cuts, not cosmetic ones" },
       right: { text: "Voted to extend the Biden-era spending baseline through multiple continuing resolutions, including a CR that added to the national debt without a single dollar in cuts.", bold: "Biden-era spending baseline" },
     },
-        {
+    {
       topic: "DOGE and Reform",
       left: { text: "Has championed government accountability and transparency his entire career. Government is too big and unaccountable, full stop.", bold: "government accountability and transparency" },
       right: { text: "Publicly signaled concern about DOGE cuts at town halls, drawing applause from frustrated constituents and questioning whether the administration had gone too far.", bold: "concern about DOGE cuts" },
     },
-        {
+    {
       topic: "Social Security",
       left: { text: "Believes in fiscal responsibility and protecting Social Security\u2019s long-term solvency, not trading short-term popularity for the program\u2019s future.", bold: "fiscal responsibility and protecting Social Security\u2019s long-term solvency" },
       right: { text: "Voted YES on the Social Security Fairness Act, a bill the CBO estimates adds $195 billion to the deficit and hastens Social Security insolvency by six months.", bold: "YES on the Social Security Fairness Act" },
     },
-        {
+    {
       topic: "Federal Lands",
       left: { text: "Led the 2014 Recapture Canyon protest to defend Utah\u2019s right to its own land and paid the price for it. Trump pardoned him. That\u2019s a track record, not a talking point.", bold: "Led the 2014 Recapture Canyon protest" },
       right: { text: "Has spoken on federal land issues but built her career inside the DC system: a former congressional staffer hired by Rep. Chris Stewart in 2019.", bold: "a former congressional staffer" },
     },
-        {
+    {
       topic: "Establishment Ties",
       left: { text: "Not beholden to the DC donor class. Running on volunteer signatures alone, his campaign answers to the voters of the 3rd District, not the establishment.", bold: "Not beholden to the DC donor class" },
       right: { text: "Member of the Republican Main Street Caucus, the moderate wing of the party. Endorsed by establishment figures including Reps. Curtis, Moore, and Owens.", bold: "Republican Main Street Caucus" },
     },
-        {
+    {
       topic: "Ballot Access",
       left: { text: "Wildly popular with Republican delegates, the grassroots activists who know the issues and the candidates. Earning every signature through volunteers.", bold: "Republican delegates" },
       right: { text: "Filing through paid signature gathering to bypass the convention process, after losing the 2024 convention to a primary challenger 57% to 43%.", bold: "paid signature gathering" },
     },
-        {
+    {
       topic: "Our District",
       left: { text: "Born and raised in Blanding: Phil is from this district. He has spent his career fighting for San Juan County and eastern Utah\u2019s way of life.", bold: "Phil is from this district" },
       right: { text: "Representing Salt Lake area voters her entire career. The 3rd District\u2019s 17 rural counties are new territory for her.", bold: "are new territory for her" },
@@ -169,6 +172,50 @@ function PhotoSlot({ src, onUpload, style }) {
 export default function App() {
   const [data, setData] = useState(DEFAULT_DATA);
   const [editMode, setEditMode] = useState(true);
+  const [syncStatus, setSyncStatus] = useState("idle");
+  const saveTimer = useRef(null);
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase
+      .from("card_data")
+      .select("data")
+      .eq("id", CARD_ID)
+      .single()
+      .then(({ data: row, error }) => {
+        if (!error && row?.data) {
+          setData(row.data);
+        }
+      });
+
+    const channel = supabase
+      .channel("card_data_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
+        (payload) => {
+          if (payload.new?.data) {
+            setData(payload.new.data);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  const saveToSupabase = useCallback((newData) => {
+    if (!supabase) return;
+    clearTimeout(saveTimer.current);
+    setSyncStatus("saving");
+    saveTimer.current = setTimeout(async () => {
+      const { error } = await supabase
+        .from("card_data")
+        .upsert({ id: CARD_ID, data: newData, updated_at: new Date().toISOString() });
+      setSyncStatus(error ? "error" : "saved");
+      setTimeout(() => setSyncStatus("idle"), 2000);
+    }, 800);
+  }, []);
 
   const set = (path, value) => {
     setData(prev => {
@@ -177,6 +224,7 @@ export default function App() {
       let obj = next;
       for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
       obj[keys[keys.length - 1]] = value;
+      saveToSupabase(next);
       return next;
     });
   };
@@ -185,23 +233,32 @@ export default function App() {
     setData(prev => {
       const next = JSON.parse(JSON.stringify(prev));
       next.rows[i][side][field] = value;
+      saveToSupabase(next);
       return next;
     });
   };
 
   const addRow = () => {
-    setData(prev => ({
-      ...prev,
-      rows: [...prev.rows, {
-        topic: "New Topic",
-        left: { text: "Enter record here.", bold: "" },
-        right: { text: "Enter commitment here.", bold: "" },
-      }]
-    }));
+    setData(prev => {
+      const next = {
+        ...prev,
+        rows: [...prev.rows, {
+          topic: "New Topic",
+          left: { text: "Enter record here.", bold: "" },
+          right: { text: "Enter commitment here.", bold: "" },
+        }]
+      };
+      saveToSupabase(next);
+      return next;
+    });
   };
 
   const removeRow = (i) => {
-    setData(prev => ({ ...prev, rows: prev.rows.filter((_, idx) => idx !== i) }));
+    setData(prev => {
+      const next = { ...prev, rows: prev.rows.filter((_, idx) => idx !== i) };
+      saveToSupabase(next);
+      return next;
+    });
   };
 
   const NAVY = "#1C2B4A";
@@ -233,8 +290,25 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: "#111", padding: "24px 16px", fontFamily: body }}>
 
       <div style={{ maxWidth: 1040, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
-          {editMode ? "Double-click any text to edit. Click photos to replace them." : "Preview mode."}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+            {editMode ? "Double-click any text to edit. Click photos to replace them." : "Preview mode."}
+          </div>
+          {supabase && (
+            <div style={{
+              fontSize: 11, fontFamily: body, padding: "3px 10px", borderRadius: 3,
+              background: syncStatus === "saved" ? "rgba(50,180,100,0.2)" : syncStatus === "saving" ? "rgba(200,168,75,0.2)" : syncStatus === "error" ? "rgba(180,50,50,0.2)" : "transparent",
+              color: syncStatus === "saved" ? "#4fc87a" : syncStatus === "saving" ? GOLD : syncStatus === "error" ? "#e06060" : "transparent",
+              transition: "all 0.3s",
+            }}>
+              {syncStatus === "saving" ? "Saving..." : syncStatus === "saved" ? "Saved" : syncStatus === "error" ? "Save failed" : ""}
+            </div>
+          )}
+          {!supabase && (
+            <div style={{ fontSize: 11, color: "rgba(255,100,100,0.6)", fontFamily: body }}>
+              Supabase not connected. Edits are local only.
+            </div>
+          )}
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setEditMode(m => !m)} style={btnStyle("#333", "#aaa")}>
@@ -354,46 +428,13 @@ export default function App() {
 
       <style>{`
         @media print {
-          @page {
-            size: 11in 8.5in;
-            margin: 0.25in;
-          }
-          html, body {
-            width: 11in;
-            height: 8.5in;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            overflow: hidden !important;
-          }
-          #root {
-            width: 11in;
-            height: 8.5in;
-            overflow: hidden !important;
-          }
-          #root > div {
-            padding: 0 !important;
-            background: white !important;
-            height: 8.5in !important;
-            width: 11in !important;
-            overflow: hidden !important;
-          }
-          #root > div > div:first-child {
-            display: none !important;
-          }
-          #card {
-            width: 10.5in !important;
-            max-width: 10.5in !important;
-            box-shadow: none !important;
-            margin: 0 auto !important;
-            overflow: hidden !important;
-            transform-origin: top center;
-            transform: scale(0.98);
-          }
-          #card * {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
+          @page { size: 11in 8.5in; margin: 0.25in; }
+          html, body { width: 11in; height: 8.5in; margin: 0 !important; padding: 0 !important; background: white !important; overflow: hidden !important; }
+          #root { width: 11in; height: 8.5in; overflow: hidden !important; }
+          #root > div { padding: 0 !important; background: white !important; height: 8.5in !important; width: 11in !important; overflow: hidden !important; }
+          #root > div > div:first-child { display: none !important; }
+          #card { width: 10.5in !important; max-width: 10.5in !important; box-shadow: none !important; margin: 0 auto !important; overflow: hidden !important; transform-origin: top center; transform: scale(0.98); }
+          #card * { page-break-inside: avoid !important; break-inside: avoid !important; }
           button { display: none !important; }
         }
       `}</style>
