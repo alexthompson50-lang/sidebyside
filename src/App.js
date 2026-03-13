@@ -104,7 +104,6 @@ function Editable({ value, onChange, style, multiline, placeholder }) {
         outline: editing ? "2px dashed rgba(200,168,75,0.8)" : "none",
         outlineOffset: 2,
         borderRadius: 2,
-        display: "block",
         whiteSpace: multiline ? "pre-wrap" : "normal",
       }}
       title={editing ? undefined : "Double-click to edit"}
