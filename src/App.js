@@ -10,52 +10,52 @@ const DEFAULT_DATA = {
     tagline: "Who will fight for eastern and southern Utah?",
   },
   left: {
-    name: "Celeste Maloy",
-    role: "DC Incumbent, District 2",
-    colHeader: "Her Record",
-    photo: MALOY_DEFAULT,
-  },
-  right: {
     name: "Phil Lyman",
     role: "Outsider, Our Candidate",
     colHeader: "Phil\u2019s Commitment",
     photo: PHIL_DEFAULT,
   },
+  right: {
+    name: "Celeste Maloy",
+    role: "DC Incumbent, District 2",
+    colHeader: "Her Record",
+    photo: MALOY_DEFAULT,
+  },
   rows: [
-    {
+        {
       topic: "Spending",
-      left: { text: "Voted to extend the Biden-era spending baseline through multiple continuing resolutions, including a CR that added to the national debt without a single dollar in cuts.", bold: "Biden-era spending baseline" },
-      right: { text: "Will demand real cuts, not cosmetic ones. Utah\u2019s 3rd District cannot afford trillion-dollar deficits passed down to our children and grandchildren.", bold: "real cuts, not cosmetic ones" },
+      left: { text: "Will demand real cuts, not cosmetic ones. Utah\u2019s 3rd District cannot afford trillion-dollar deficits passed down to our children and grandchildren.", bold: "real cuts, not cosmetic ones" },
+      right: { text: "Voted to extend the Biden-era spending baseline through multiple continuing resolutions, including a CR that added to the national debt without a single dollar in cuts.", bold: "Biden-era spending baseline" },
     },
-    {
+        {
       topic: "DOGE and Reform",
-      left: { text: "Publicly signaled concern about DOGE cuts at town halls, drawing applause from frustrated constituents and questioning whether the administration had gone too far.", bold: "concern about DOGE cuts" },
-      right: { text: "Has championed government accountability and transparency his entire career. Government is too big and unaccountable, full stop.", bold: "government accountability and transparency" },
+      left: { text: "Has championed government accountability and transparency his entire career. Government is too big and unaccountable, full stop.", bold: "government accountability and transparency" },
+      right: { text: "Publicly signaled concern about DOGE cuts at town halls, drawing applause from frustrated constituents and questioning whether the administration had gone too far.", bold: "concern about DOGE cuts" },
     },
-    {
+        {
       topic: "Social Security",
-      left: { text: "Voted YES on the Social Security Fairness Act, a bill the CBO estimates adds $195 billion to the deficit and hastens Social Security insolvency by six months.", bold: "YES on the Social Security Fairness Act" },
-      right: { text: "Believes in fiscal responsibility and protecting Social Security\u2019s long-term solvency, not trading short-term popularity for the program\u2019s future.", bold: "fiscal responsibility and protecting Social Security\u2019s long-term solvency" },
+      left: { text: "Believes in fiscal responsibility and protecting Social Security\u2019s long-term solvency, not trading short-term popularity for the program\u2019s future.", bold: "fiscal responsibility and protecting Social Security\u2019s long-term solvency" },
+      right: { text: "Voted YES on the Social Security Fairness Act, a bill the CBO estimates adds $195 billion to the deficit and hastens Social Security insolvency by six months.", bold: "YES on the Social Security Fairness Act" },
     },
-    {
+        {
       topic: "Federal Lands",
-      left: { text: "Has spoken on federal land issues but built her career inside the DC system: a former congressional staffer hired by Rep. Chris Stewart in 2019.", bold: "a former congressional staffer" },
-      right: { text: "Led the 2014 Recapture Canyon protest to defend Utah\u2019s right to its own land and paid the price for it. Trump pardoned him. That\u2019s a track record, not a talking point.", bold: "Led the 2014 Recapture Canyon protest" },
+      left: { text: "Led the 2014 Recapture Canyon protest to defend Utah\u2019s right to its own land and paid the price for it. Trump pardoned him. That\u2019s a track record, not a talking point.", bold: "Led the 2014 Recapture Canyon protest" },
+      right: { text: "Has spoken on federal land issues but built her career inside the DC system: a former congressional staffer hired by Rep. Chris Stewart in 2019.", bold: "a former congressional staffer" },
     },
-    {
+        {
       topic: "Establishment Ties",
-      left: { text: "Member of the Republican Main Street Caucus, the moderate wing of the party. Endorsed by establishment figures including Reps. Curtis, Moore, and Owens.", bold: "Republican Main Street Caucus" },
-      right: { text: "Not beholden to the DC donor class. Running on volunteer signatures alone, his campaign answers to the voters of the 3rd District, not the establishment.", bold: "Not beholden to the DC donor class" },
+      left: { text: "Not beholden to the DC donor class. Running on volunteer signatures alone, his campaign answers to the voters of the 3rd District, not the establishment.", bold: "Not beholden to the DC donor class" },
+      right: { text: "Member of the Republican Main Street Caucus, the moderate wing of the party. Endorsed by establishment figures including Reps. Curtis, Moore, and Owens.", bold: "Republican Main Street Caucus" },
     },
-    {
+        {
       topic: "Ballot Access",
-      left: { text: "Filing through paid signature gathering to bypass the convention process, after losing the 2024 convention to a primary challenger 57% to 43%.", bold: "paid signature gathering" },
-      right: { text: "Wildly popular with Republican delegates, the grassroots activists who know the issues and the candidates. Earning every signature through volunteers.", bold: "Republican delegates" },
+      left: { text: "Wildly popular with Republican delegates, the grassroots activists who know the issues and the candidates. Earning every signature through volunteers.", bold: "Republican delegates" },
+      right: { text: "Filing through paid signature gathering to bypass the convention process, after losing the 2024 convention to a primary challenger 57% to 43%.", bold: "paid signature gathering" },
     },
-    {
+        {
       topic: "Our District",
-      left: { text: "Representing Salt Lake area voters her entire career. The 3rd District\u2019s 17 rural counties are new territory for her.", bold: "are new territory for her" },
-      right: { text: "Born and raised in Blanding: Phil is from this district. He has spent his career fighting for San Juan County and eastern Utah\u2019s way of life.", bold: "Phil is from this district" },
+      left: { text: "Born and raised in Blanding: Phil is from this district. He has spent his career fighting for San Juan County and eastern Utah\u2019s way of life.", bold: "Phil is from this district" },
+      right: { text: "Representing Salt Lake area voters her entire career. The 3rd District\u2019s 17 rural counties are new territory for her.", bold: "are new territory for her" },
     },
   ],
   footer: "All information sourced from public voting records, GovTrack, Congressional Budget Office analyses, and published news reporting. No claims fabricated or inferred.",
@@ -111,6 +111,20 @@ function Editable({ value, onChange, style, multiline, placeholder }) {
     >
       {value || placeholder}
     </span>
+  );
+}
+
+function BoldText({ text, bold, color, boldColor }) {
+  if (!bold || !text.includes(bold)) {
+    return <span style={{ color }}>{text}</span>;
+  }
+  const idx = text.indexOf(bold);
+  return (
+    <>
+      {idx > 0 && <span style={{ color }}>{text.slice(0, idx)}</span>}
+      <span style={{ color: boldColor, fontWeight: 700 }}>{bold}</span>
+      {idx + bold.length < text.length && <span style={{ color }}>{text.slice(idx + bold.length)}</span>}
+    </>
   );
 }
 
@@ -266,11 +280,11 @@ export default function App() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}` }}>
           <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, padding: "7px 20px" }}>
             <Editable value={data.left.colHeader} onChange={v => set("left.colHeader", v)}
-              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }} />
+              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }} />
           </div>
           <div style={{ background: NAVY, padding: "7px 20px" }}>
             <Editable value={data.right.colHeader} onChange={v => set("right.colHeader", v)}
-              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }} />
+              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }} />
           </div>
         </div>
 
@@ -283,8 +297,14 @@ export default function App() {
               <div style={{ background: leftBg, borderBottom: "1px solid #C8B89A", borderRight: `4px solid ${NAVY}`, padding: "9px 20px" }}>
                 <Editable value={row.topic} onChange={v => setRow(i, "topic", "topic", v)}
                   style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }} />
-                <Editable value={row.left.text} onChange={v => setRow(i, "left", "text", v)} multiline
-                  style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }} />
+                {editMode ? (
+                  <Editable value={row.left.text} onChange={v => setRow(i, "left", "text", v)} multiline
+                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }} />
+                ) : (
+                  <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }}>
+                    <BoldText text={row.left.text} bold={row.left.bold} color={DARK_BROWN} boldColor={RED} />
+                  </div>
+                )}
                 {editMode && (
                   <div style={{ marginTop: 4 }}>
                     <span style={{ fontFamily: body, fontSize: 10, color: MED_BROWN }}>Bold phrase: </span>
@@ -297,8 +317,14 @@ export default function App() {
                 <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: "rgba(200,168,75,0.15)", color: GOLD_TAG, padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>
                   {row.topic}
                 </div>
-                <Editable value={row.right.text} onChange={v => setRow(i, "right", "text", v)} multiline
-                  style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }} />
+                {editMode ? (
+                  <Editable value={row.right.text} onChange={v => setRow(i, "right", "text", v)} multiline
+                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }} />
+                ) : (
+                  <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }}>
+                    <BoldText text={row.right.text} bold={row.right.bold} color={LIGHT_NAVY_TEXT} boldColor={GOLD_MUTED} />
+                  </div>
+                )}
                 {editMode && (
                   <div style={{ marginTop: 4 }}>
                     <span style={{ fontFamily: body, fontSize: 10, color: "rgba(200,168,75,0.5)" }}>Bold phrase: </span>
@@ -328,11 +354,47 @@ export default function App() {
 
       <style>{`
         @media print {
-          body { background: white !important; padding: 0 !important; }
-          #root > div > div:first-child { display: none !important; }
-          #card { max-width: 100% !important; box-shadow: none !important; }
+          @page {
+            size: 11in 8.5in;
+            margin: 0.25in;
+          }
+          html, body {
+            width: 11in;
+            height: 8.5in;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            overflow: hidden !important;
+          }
+          #root {
+            width: 11in;
+            height: 8.5in;
+            overflow: hidden !important;
+          }
+          #root > div {
+            padding: 0 !important;
+            background: white !important;
+            height: 8.5in !important;
+            width: 11in !important;
+            overflow: hidden !important;
+          }
+          #root > div > div:first-child {
+            display: none !important;
+          }
+          #card {
+            width: 10.5in !important;
+            max-width: 10.5in !important;
+            box-shadow: none !important;
+            margin: 0 auto !important;
+            overflow: hidden !important;
+            transform-origin: top center;
+            transform: scale(0.98);
+          }
+          #card * {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
           button { display: none !important; }
-          @page { size: landscape; margin: 0.35in; }
         }
       `}</style>
 
