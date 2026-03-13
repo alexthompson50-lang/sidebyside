@@ -222,14 +222,14 @@ export default function PublicCard() {
           const leftBg = even ? LIGHT_TAN : CREAM;
           const rightBg = even ? MID_NAVY : NAVY;
           return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-              <div style={{ background: leftBg, borderBottom: "1px solid #C8B89A", borderRight: `4px solid ${NAVY}`, padding: "9px 20px" }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `1px solid ${GOLD}` }}>
+              <div style={{ background: leftBg, borderRight: `4px solid ${NAVY}`, padding: "9px 20px" }}>
                 <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>{row.topic}</div>
                 <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }}>
                   <BoldText text={row.left.text} bold={row.left.bold} color={DARK_BROWN} boldColor={RED} />
                 </div>
               </div>
-              <div style={{ background: rightBg, borderBottom: "1px solid #2E4268", padding: "9px 20px" }}>
+              <div style={{ background: rightBg, padding: "9px 20px" }}>
                 <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: "rgba(200,168,75,0.15)", color: GOLD_TAG, padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>{row.topic}</div>
                 <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }}>
                   <BoldText text={row.right.text} bold={row.right.bold} color={LIGHT_NAVY_TEXT} boldColor={GOLD_MUTED} />
