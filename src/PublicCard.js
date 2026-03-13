@@ -85,34 +85,15 @@ export default function PublicCard() {
   const cardRef = useRef(null);
 
   useEffect(() => {
-    if (!supabase) {
-      setData(DEFAULT_DATA);
-      return;
-    }
-    supabase
-      .from("card_data")
-      .select("data")
-      .eq("id", CARD_ID)
-      .single()
+    if (!supabase) { setData(DEFAULT_DATA); return; }
+    supabase.from("card_data").select("data").eq("id", CARD_ID).single()
       .then(({ data: row, error }) => {
-        if (!error && row?.data) {
-          setData(row.data);
-        } else {
-          setData(DEFAULT_DATA);
-        }
+        setData(!error && row?.data ? row.data : DEFAULT_DATA);
       });
-
-    const channel = supabase
-      .channel("public_card_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
-        (payload) => {
-          if (payload.new?.data) setData(payload.new.data);
-        }
-      )
+    const channel = supabase.channel("public_card_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
+        (payload) => { if (payload.new?.data) setData(payload.new.data); })
       .subscribe();
-
     return () => supabase.removeChannel(channel);
   }, []);
 
@@ -131,7 +112,6 @@ export default function PublicCard() {
   const LIGHT_NAVY_TEXT = "#DDD7CD";
   const GOLD_TAG = "#C8A84B";
   const LIGHT_BROWN = "#D0C9BC";
-
   const serif = '"Playfair Display", "Times New Roman", serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
 
@@ -139,11 +119,7 @@ export default function PublicCard() {
     setDownloading(true);
     try {
       const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: null,
-      });
+      const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: null });
       if (format === "png" || format === "jpeg") {
         const link = document.createElement("a");
         link.download = `lyman-vs-maloy.${format}`;
@@ -156,9 +132,7 @@ export default function PublicCard() {
         pdf.addImage(imgData, "JPEG", 0, 0, canvas.width / 2, canvas.height / 2);
         pdf.save("lyman-vs-maloy.pdf");
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setDownloading(false);
   };
 
@@ -173,43 +147,43 @@ export default function PublicCard() {
       <div style={{ maxWidth: 1040, margin: "0 auto 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
         {["pdf", "png", "jpeg"].map(fmt => (
           <button key={fmt} onClick={() => download(fmt)} disabled={downloading} style={{
-            background: downloading ? "#333" : "#1C2B4A",
-            color: downloading ? "#666" : "#C8A84B",
-            border: "1px solid #C8A84B",
-            padding: "6px 14px", borderRadius: 3, cursor: downloading ? "not-allowed" : "pointer",
-            fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase",
+            background: downloading ? "#333" : "#1C2B4A", color: downloading ? "#666" : "#C8A84B",
+            border: "1px solid #C8A84B", padding: "6px 14px", borderRadius: 3,
+            cursor: downloading ? "not-allowed" : "pointer", fontSize: 12, fontFamily: body,
+            fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase",
           }}>
             {downloading ? "..." : `Download ${fmt.toUpperCase()}`}
           </button>
         ))}
       </div>
+
       <div id="card" ref={cardRef} style={{ maxWidth: 1040, margin: "0 auto", boxShadow: "0 16px 64px rgba(0,0,0,0.6)" }}>
 
         <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 28px" }}>
           <div style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }}>{data.header.eyebrow}</div>
-          <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: WHITE, lineHeight: 1.2 }}>{data.header.title}</div>
+          <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: WHITE, lineHeight: 1.2, fontVariantLigatures: "none" }}>{data.header.title}</div>
           <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }}>{data.header.tagline}</div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}` }}>
-          <div style={{ background: TAN, borderRight: `4px solid ${NAVY}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+          <div style={{ background: TAN, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.left.photo} alt={data.left.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: "#2A2520", lineHeight: 1.1 }}>{data.left.name}</div>
+              <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: "#2A2520", lineHeight: 1.1, fontVariantLigatures: "none" }}>{data.left.name}</div>
               <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }}>{data.left.role}</div>
             </div>
           </div>
           <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.right.photo} alt={data.right.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: WHITE, lineHeight: 1.1 }}>{data.right.name}</div>
+              <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: WHITE, lineHeight: 1.1, fontVariantLigatures: "none" }}>{data.right.name}</div>
               <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }}>{data.right.role}</div>
             </div>
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}` }}>
-          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, padding: "7px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+          <div style={{ background: LIGHT_TAN, padding: "7px 20px" }}>
             <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }}>{data.left.colHeader}</div>
           </div>
           <div style={{ background: NAVY, padding: "7px 20px" }}>
@@ -222,8 +196,8 @@ export default function PublicCard() {
           const leftBg = even ? LIGHT_TAN : CREAM;
           const rightBg = even ? MID_NAVY : NAVY;
           return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `1px solid ${GOLD}` }}>
-              <div style={{ background: leftBg, borderRight: `4px solid ${NAVY}`, padding: "9px 20px" }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `1px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+              <div style={{ background: leftBg, padding: "9px 20px" }}>
                 <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>{row.topic}</div>
                 <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }}>
                   <BoldText text={row.left.text} bold={row.left.bold} color={DARK_BROWN} boldColor={RED} />
