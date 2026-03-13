@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase";
 
 const CARD_ID = "main";
@@ -81,6 +81,8 @@ function BoldText({ text, bold, color, boldColor }) {
 
 export default function PublicCard() {
   const [data, setData] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+  const cardRef = useRef(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -133,6 +135,33 @@ export default function PublicCard() {
   const serif = '"Playfair Display", "Times New Roman", serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
 
+  const download = async (format) => {
+    setDownloading(true);
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      });
+      if (format === "png" || format === "jpeg") {
+        const link = document.createElement("a");
+        link.download = `lyman-vs-maloy.${format}`;
+        link.href = canvas.toDataURL(`image/${format}`, 0.95);
+        link.click();
+      } else if (format === "pdf") {
+        const { jsPDF } = await import("jspdf");
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvas.width / 2, canvas.height / 2] });
+        pdf.addImage(imgData, "JPEG", 0, 0, canvas.width / 2, canvas.height / 2);
+        pdf.save("lyman-vs-maloy.pdf");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setDownloading(false);
+  };
+
   if (!data) return (
     <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ color: "rgba(255,255,255,0.3)", fontFamily: body, fontSize: 14 }}>Loading...</div>
@@ -141,7 +170,20 @@ export default function PublicCard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#111", padding: "24px 16px", fontFamily: body }}>
-      <div id="card" style={{ maxWidth: 1040, margin: "0 auto", boxShadow: "0 16px 64px rgba(0,0,0,0.6)" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        {["pdf", "png", "jpeg"].map(fmt => (
+          <button key={fmt} onClick={() => download(fmt)} disabled={downloading} style={{
+            background: downloading ? "#333" : "#1C2B4A",
+            color: downloading ? "#666" : "#C8A84B",
+            border: "1px solid #C8A84B",
+            padding: "6px 14px", borderRadius: 3, cursor: downloading ? "not-allowed" : "pointer",
+            fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase",
+          }}>
+            {downloading ? "..." : `Download ${fmt.toUpperCase()}`}
+          </button>
+        ))}
+      </div>
+      <div id="card" ref={cardRef} style={{ maxWidth: 1040, margin: "0 auto", boxShadow: "0 16px 64px rgba(0,0,0,0.6)" }}>
 
         <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 28px" }}>
           <div style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }}>{data.header.eyebrow}</div>
@@ -166,11 +208,11 @@ export default function PublicCard() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}` }}>
-          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, padding: "7px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, borderBottom: `2px solid ${GOLD}`, padding: "7px 20px" }}>
             <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }}>{data.left.colHeader}</div>
           </div>
-          <div style={{ background: NAVY, padding: "7px 20px" }}>
+          <div style={{ background: NAVY, borderBottom: `2px solid ${GOLD}`, padding: "7px 20px" }}>
             <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }}>{data.right.colHeader}</div>
           </div>
         </div>
