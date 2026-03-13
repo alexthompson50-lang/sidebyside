@@ -2,9 +2,26 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase";
 
 const CARD_ID = "main";
-
 const PHIL_DEFAULT = "/phil.jpeg";
 const MALOY_DEFAULT = "/maloy.jpeg";
+
+const NAVY = "#1C2B4A";
+const GOLD = "#C8A84B";
+const CREAM = "#F5F0E8";
+const TAN = "#DDD7CD";
+const LIGHT_TAN = "#EDE8DE";
+const DARK_NAVY = "#152038";
+const MID_NAVY = "#203357";
+const RED = "#B02A18";
+const WHITE = "#FFFFFF";
+const DARK_BROWN = "#3A3530";
+const MED_BROWN = "#6A5F57";
+const GOLD_MUTED = "#E8C86A";
+const LIGHT_NAVY_TEXT = "#DDD7CD";
+const GOLD_TAG = "#C8A84B";
+const LIGHT_BROWN = "#D0C9BC";
+const serif = '"Times New Roman", Times, serif';
+const body = '"Source Serif 4", "Times New Roman", serif';
 
 const DEFAULT_DATA = {
   header: {
@@ -25,41 +42,13 @@ const DEFAULT_DATA = {
     photo: MALOY_DEFAULT,
   },
   rows: [
-    {
-      topic: "Spending",
-      left: { text: "Will demand real cuts, not cosmetic ones. Utah\u2019s 3rd District cannot afford trillion-dollar deficits passed down to our children and grandchildren.", bold: "real cuts, not cosmetic ones" },
-      right: { text: "Voted to extend the Biden-era spending baseline through multiple continuing resolutions, including a CR that added to the national debt without a single dollar in cuts.", bold: "Biden-era spending baseline" },
-    },
-    {
-      topic: "DOGE and Reform",
-      left: { text: "Has championed government accountability and transparency his entire career. Government is too big and unaccountable, full stop.", bold: "government accountability and transparency" },
-      right: { text: "Publicly signaled concern about DOGE cuts at town halls, drawing applause from frustrated constituents and questioning whether the administration had gone too far.", bold: "concern about DOGE cuts" },
-    },
-    {
-      topic: "Social Security",
-      left: { text: "Believes in fiscal responsibility and protecting Social Security\u2019s long-term solvency, not trading short-term popularity for the program\u2019s future.", bold: "fiscal responsibility and protecting Social Security\u2019s long-term solvency" },
-      right: { text: "Voted YES on the Social Security Fairness Act, a bill the CBO estimates adds $195 billion to the deficit and hastens Social Security insolvency by six months.", bold: "YES on the Social Security Fairness Act" },
-    },
-    {
-      topic: "Federal Lands",
-      left: { text: "Led the 2014 Recapture Canyon protest to defend Utah\u2019s right to its own land and paid the price for it. Trump pardoned him. That\u2019s a track record, not a talking point.", bold: "Led the 2014 Recapture Canyon protest" },
-      right: { text: "Has spoken on federal land issues but built her career inside the DC system: a former congressional staffer hired by Rep. Chris Stewart in 2019.", bold: "a former congressional staffer" },
-    },
-    {
-      topic: "Establishment Ties",
-      left: { text: "Not beholden to the DC donor class. Running on volunteer signatures alone, his campaign answers to the voters of the 3rd District, not the establishment.", bold: "Not beholden to the DC donor class" },
-      right: { text: "Member of the Republican Main Street Caucus, the moderate wing of the party. Endorsed by establishment figures including Reps. Curtis, Moore, and Owens.", bold: "Republican Main Street Caucus" },
-    },
-    {
-      topic: "Ballot Access",
-      left: { text: "Wildly popular with Republican delegates, the grassroots activists who know the issues and the candidates. Earning every signature through volunteers.", bold: "Republican delegates" },
-      right: { text: "Filing through paid signature gathering to bypass the convention process, after losing the 2024 convention to a primary challenger 57% to 43%.", bold: "paid signature gathering" },
-    },
-    {
-      topic: "Our District",
-      left: { text: "Born and raised in Blanding: Phil is from this district. He has spent his career fighting for San Juan County and eastern Utah\u2019s way of life.", bold: "Phil is from this district" },
-      right: { text: "Representing Salt Lake area voters her entire career. The 3rd District\u2019s 17 rural counties are new territory for her.", bold: "are new territory for her" },
-    },
+    { topic: "Spending", left: { text: "Will demand real cuts, not cosmetic ones. Utah\u2019s 3rd District cannot afford trillion-dollar deficits passed down to our children and grandchildren.", bold: "real cuts, not cosmetic ones" }, right: { text: "Voted to extend the Biden-era spending baseline through multiple continuing resolutions, including a CR that added to the national debt without a single dollar in cuts.", bold: "Biden-era spending baseline" } },
+    { topic: "DOGE and Reform", left: { text: "Has championed government accountability and transparency his entire career. Government is too big and unaccountable, full stop.", bold: "government accountability and transparency" }, right: { text: "Publicly signaled concern about DOGE cuts at town halls, drawing applause from frustrated constituents and questioning whether the administration had gone too far.", bold: "concern about DOGE cuts" } },
+    { topic: "Social Security", left: { text: "Believes in fiscal responsibility and protecting Social Security\u2019s long-term solvency, not trading short-term popularity for the program\u2019s future.", bold: "fiscal responsibility and protecting Social Security\u2019s long-term solvency" }, right: { text: "Voted YES on the Social Security Fairness Act, a bill the CBO estimates adds $195 billion to the deficit and hastens Social Security insolvency by six months.", bold: "YES on the Social Security Fairness Act" } },
+    { topic: "Federal Lands", left: { text: "Led the 2014 Recapture Canyon protest to defend Utah\u2019s right to its own land and paid the price for it. Trump pardoned him. That\u2019s a track record, not a talking point.", bold: "Led the 2014 Recapture Canyon protest" }, right: { text: "Has spoken on federal land issues but built her career inside the DC system: a former congressional staffer hired by Rep. Chris Stewart in 2019.", bold: "a former congressional staffer" } },
+    { topic: "Establishment Ties", left: { text: "Not beholden to the DC donor class. Running on volunteer signatures alone, his campaign answers to the voters of the 3rd District, not the establishment.", bold: "Not beholden to the DC donor class" }, right: { text: "Member of the Republican Main Street Caucus, the moderate wing of the party. Endorsed by establishment figures including Reps. Curtis, Moore, and Owens.", bold: "Republican Main Street Caucus" } },
+    { topic: "Ballot Access", left: { text: "Wildly popular with Republican delegates, the grassroots activists who know the issues and the candidates. Earning every signature through volunteers.", bold: "Republican delegates" }, right: { text: "Filing through paid signature gathering to bypass the convention process, after losing the 2024 convention to a primary challenger 57% to 43%.", bold: "paid signature gathering" } },
+    { topic: "Our District", left: { text: "Born and raised in Blanding: Phil is from this district. He has spent his career fighting for San Juan County and eastern Utah\u2019s way of life.", bold: "Phil is from this district" }, right: { text: "Representing Salt Lake area voters her entire career. The 3rd District\u2019s 17 rural counties are new territory for her.", bold: "are new territory for her" } },
   ],
   footer: "All information sourced from public voting records, GovTrack, Congressional Budget Office analyses, and published news reporting. No claims fabricated or inferred.",
   footerRight: "Phil Lyman for Congress  |  lymanforutah.com",
@@ -95,24 +84,6 @@ export default function PublicCard() {
     return () => supabase.removeChannel(channel);
   }, []);
 
-  const NAVY = "#1C2B4A";
-  const GOLD = "#C8A84B";
-  const CREAM = "#F5F0E8";
-  const TAN = "#DDD7CD";
-  const LIGHT_TAN = "#EDE8DE";
-  const DARK_NAVY = "#152038";
-  const MID_NAVY = "#203357";
-  const RED = "#B02A18";
-  const WHITE = "#FFFFFF";
-  const DARK_BROWN = "#3A3530";
-  const MED_BROWN = "#6A5F57";
-  const GOLD_MUTED = "#E8C86A";
-  const LIGHT_NAVY_TEXT = "#DDD7CD";
-  const GOLD_TAG = "#C8A84B";
-  const LIGHT_BROWN = "#D0C9BC";
-  const serif = '"Times New Roman", Times, serif';
-  const body = '"Source Serif 4", "Times New Roman", serif';
-
   const download = async (format) => {
     setDownloading(true);
     try {
@@ -141,12 +112,13 @@ export default function PublicCard() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#111", padding: "24px 16px", fontFamily: body }}>
-      <div style={{ maxWidth: 1040, margin: "0 auto 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+    <div style={{ minHeight: "100vh", background: "#111", padding: "16px", fontFamily: body, overflowX: "hidden", maxWidth: "100vw" }}>
+
+      <div style={{ maxWidth: 1040, margin: "0 auto 16px", display: "flex", justifyContent: "flex-start", gap: 8, flexWrap: "wrap" }}>
         {["pdf", "png", "jpeg"].map(fmt => (
           <button key={fmt} onClick={() => download(fmt)} disabled={downloading} style={{
-            background: downloading ? "#333" : "#1C2B4A", color: downloading ? "#666" : "#C8A84B",
-            border: "1px solid #C8A84B", padding: "6px 14px", borderRadius: 3,
+            background: downloading ? "#333" : NAVY, color: downloading ? "#666" : GOLD,
+            border: `1px solid ${GOLD}`, padding: "6px 14px", borderRadius: 3,
             cursor: downloading ? "not-allowed" : "pointer", fontSize: 12, fontFamily: body,
             fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase",
           }}>
@@ -157,35 +129,35 @@ export default function PublicCard() {
 
       <div id="card" ref={cardRef} style={{ maxWidth: 1040, margin: "0 auto", boxShadow: "0 16px 64px rgba(0,0,0,0.6)" }}>
 
-        <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 28px" }}>
+        <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 20px" }}>
           <div style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }}>{data.header.eyebrow}</div>
-          <div style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: WHITE, lineHeight: 1.2 }}>{data.header.title}</div>
-          <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }}>{data.header.tagline}</div>
+          <div style={{ fontFamily: serif, fontSize: "clamp(18px, 3vw, 26px)", fontWeight: 700, color: WHITE, lineHeight: 1.2 }}>{data.header.title}</div>
+          <div style={{ fontFamily: body, fontStyle: "italic", fontSize: "clamp(11px, 1.8vw, 13px)", color: "rgba(200,168,75,0.8)", marginTop: 4 }}>{data.header.tagline}</div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
-          <div style={{ background: TAN, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
-            <img src={data.left.photo} alt={data.left.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
-            <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: "#2A2520", lineHeight: 1.1 }}>{data.left.name}</div>
-              <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }}>{data.left.role}</div>
+          <div style={{ background: TAN, padding: "10px 12px", display: "flex", alignItems: "center", gap: 10, minWidth: 0, overflow: "hidden" }}>
+            <img src={data.left.photo} alt={data.left.name} style={{ width: 56, height: 68, objectFit: "cover", objectPosition: "top center", flexShrink: 0, display: "block" }} />
+            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+              <div style={{ fontFamily: serif, fontSize: "clamp(14px, 4vw, 28px)", fontWeight: 700, color: "#2A2520", lineHeight: 1.1, wordBreak: "break-word" }}>{data.left.name}</div>
+              <div style={{ fontFamily: body, fontStyle: "italic", fontSize: "clamp(9px, 1.5vw, 12px)", color: MED_BROWN, marginTop: 3 }}>{data.left.role}</div>
             </div>
           </div>
-          <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
-            <img src={data.right.photo} alt={data.right.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
-            <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: WHITE, lineHeight: 1.1 }}>{data.right.name}</div>
-              <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }}>{data.right.role}</div>
+          <div style={{ background: DARK_NAVY, padding: "10px 12px", display: "flex", alignItems: "center", gap: 10, minWidth: 0, overflow: "hidden" }}>
+            <img src={data.right.photo} alt={data.right.name} style={{ width: 56, height: 68, objectFit: "cover", objectPosition: "top center", flexShrink: 0, display: "block" }} />
+            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+              <div style={{ fontFamily: serif, fontSize: "clamp(14px, 4vw, 28px)", fontWeight: 700, color: WHITE, lineHeight: 1.1, wordBreak: "break-word" }}>{data.right.name}</div>
+              <div style={{ fontFamily: body, fontStyle: "italic", fontSize: "clamp(9px, 1.5vw, 12px)", color: GOLD, marginTop: 3 }}>{data.right.role}</div>
             </div>
           </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
-          <div style={{ background: LIGHT_TAN, padding: "7px 20px" }}>
-            <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }}>{data.left.colHeader}</div>
+          <div style={{ background: LIGHT_TAN, padding: "6px 12px" }}>
+            <div style={{ fontFamily: body, fontSize: "clamp(7px, 1.2vw, 11px)", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", color: GOLD }}>{data.left.colHeader}</div>
           </div>
-          <div style={{ background: NAVY, padding: "7px 20px" }}>
-            <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }}>{data.right.colHeader}</div>
+          <div style={{ background: NAVY, padding: "6px 12px" }}>
+            <div style={{ fontFamily: body, fontSize: "clamp(7px, 1.2vw, 11px)", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", color: "#8A3A2A" }}>{data.right.colHeader}</div>
           </div>
         </div>
 
@@ -195,15 +167,15 @@ export default function PublicCard() {
           const rightBg = even ? MID_NAVY : NAVY;
           return (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `1px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
-              <div style={{ background: leftBg, padding: "9px 20px" }}>
-                <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>{row.topic}</div>
-                <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }}>
+              <div style={{ background: leftBg, padding: "8px 12px" }}>
+                <div style={{ display: "inline-block", fontFamily: body, fontSize: "clamp(7px, 1vw, 9px)", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 5px", marginBottom: 4, borderRadius: 2 }}>{row.topic}</div>
+                <div style={{ fontFamily: body, fontSize: "clamp(10px, 1.5vw, 12px)", lineHeight: 1.5, color: DARK_BROWN }}>
                   <BoldText text={row.left.text} bold={row.left.bold} color={DARK_BROWN} boldColor={RED} />
                 </div>
               </div>
-              <div style={{ background: rightBg, padding: "9px 20px" }}>
-                <div style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: "rgba(200,168,75,0.15)", color: GOLD_TAG, padding: "1px 6px", marginBottom: 5, borderRadius: 2 }}>{row.topic}</div>
-                <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }}>
+              <div style={{ background: rightBg, padding: "8px 12px" }}>
+                <div style={{ display: "inline-block", fontFamily: body, fontSize: "clamp(7px, 1vw, 9px)", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: "rgba(200,168,75,0.15)", color: GOLD_TAG, padding: "1px 5px", marginBottom: 4, borderRadius: 2 }}>{row.topic}</div>
+                <div style={{ fontFamily: body, fontSize: "clamp(10px, 1.5vw, 12px)", lineHeight: 1.5, color: LIGHT_NAVY_TEXT }}>
                   <BoldText text={row.right.text} bold={row.right.bold} color={LIGHT_NAVY_TEXT} boldColor={GOLD_MUTED} />
                 </div>
               </div>
@@ -211,9 +183,9 @@ export default function PublicCard() {
           );
         })}
 
-        <div style={{ background: NAVY, borderTop: `4px solid ${GOLD}`, padding: "10px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20 }}>
-          <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 10, color: "rgba(255,255,255,0.35)", flex: 1 }}>{data.footer}</div>
-          <div style={{ fontFamily: serif, fontSize: 12, fontWeight: 700, color: GOLD, textAlign: "right", whiteSpace: "nowrap" }}>{data.footerRight}</div>
+        <div style={{ background: NAVY, borderTop: `4px solid ${GOLD}`, padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: body, fontStyle: "italic", fontSize: "clamp(9px, 1.2vw, 10px)", color: "rgba(255,255,255,0.35)", flex: 1, minWidth: 0 }}>{data.footer}</div>
+          <div style={{ fontFamily: serif, fontSize: "clamp(10px, 1.5vw, 12px)", fontWeight: 700, color: GOLD, whiteSpace: "nowrap" }}>{data.footerRight}</div>
         </div>
 
       </div>
