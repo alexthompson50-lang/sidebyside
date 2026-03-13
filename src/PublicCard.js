@@ -191,15 +191,15 @@ export default function PublicCard() {
           <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }}>{data.header.tagline}</div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-          <div style={{ background: TAN, borderBottom: `3px solid ${GOLD}`, borderRight: `4px solid ${NAVY}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}` }}>
+          <div style={{ background: TAN, borderRight: `4px solid ${NAVY}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.left.photo} alt={data.left.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
               <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: "#2A2520", lineHeight: 1.1 }}>{data.left.name}</div>
               <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }}>{data.left.role}</div>
             </div>
           </div>
-          <div style={{ background: DARK_NAVY, borderBottom: `3px solid ${GOLD}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
+          <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.right.photo} alt={data.right.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
               <div style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: WHITE, lineHeight: 1.1 }}>{data.right.name}</div>
@@ -208,11 +208,11 @@ export default function PublicCard() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, borderBottom: `2px solid ${GOLD}`, padding: "7px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}` }}>
+          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, padding: "7px 20px" }}>
             <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }}>{data.left.colHeader}</div>
           </div>
-          <div style={{ background: NAVY, borderBottom: `2px solid ${GOLD}`, padding: "7px 20px" }}>
+          <div style={{ background: NAVY, padding: "7px 20px" }}>
             <div style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }}>{data.right.colHeader}</div>
           </div>
         </div>
