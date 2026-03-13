@@ -69,7 +69,6 @@ const DEFAULT_DATA = {
 function Editable({ value, onChange, style, multiline, placeholder }) {
   const [editing, setEditing] = useState(false);
   const ref = useRef(null);
-
   const start = useCallback(() => {
     setEditing(true);
     setTimeout(() => {
@@ -83,17 +82,14 @@ function Editable({ value, onChange, style, multiline, placeholder }) {
       }
     }, 0);
   }, []);
-
   const commit = useCallback(() => {
     setEditing(false);
     if (ref.current) onChange(ref.current.innerText.trim());
   }, [onChange]);
-
   const onKey = useCallback((e) => {
     if (!multiline && e.key === "Enter") { e.preventDefault(); commit(); }
     if (e.key === "Escape") { setEditing(false); if (ref.current) ref.current.innerText = value; }
   }, [multiline, commit, value]);
-
   return (
     <span
       ref={ref}
@@ -119,9 +115,7 @@ function Editable({ value, onChange, style, multiline, placeholder }) {
 }
 
 function BoldText({ text, bold, color, boldColor }) {
-  if (!bold || !text.includes(bold)) {
-    return <span style={{ color }}>{text}</span>;
-  }
+  if (!bold || !text.includes(bold)) return <span style={{ color }}>{text}</span>;
   const idx = text.indexOf(bold);
   return (
     <>
@@ -150,21 +144,15 @@ function PhotoSlot({ src, onUpload, style }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <img
-        src={src}
-        alt=""
-        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
-      />
+      <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
       <div style={{
         position: "absolute", inset: 0,
         background: hover ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background 0.15s",
-        fontSize: 11, color: hover ? "#fff" : "transparent",
+        transition: "background 0.15s", fontSize: 11,
+        color: hover ? "#fff" : "transparent",
         fontFamily: '"Source Serif 4", serif',
-      }}>
-        Click to replace
-      </div>
+      }}>Click to replace</div>
       <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
     </div>
   );
@@ -177,42 +165,25 @@ function PasswordGate({ onUnlock }) {
   const serif = '"Playfair Display", "Times New Roman", serif';
   const NAVY = "#1C2B4A";
   const GOLD = "#C8A84B";
-
   const attempt = () => {
-    if (input === EDIT_PASSWORD) {
-      onUnlock();
-    } else {
-      setError(true);
-      setInput("");
-      setTimeout(() => setError(false), 2000);
-    }
+    if (input === EDIT_PASSWORD) { onUnlock(); }
+    else { setError(true); setInput(""); setTimeout(() => setError(false), 2000); }
   };
-
   return (
     <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: body }}>
       <div style={{ background: NAVY, padding: "48px 40px", borderRadius: 6, boxShadow: "0 16px 64px rgba(0,0,0,0.6)", border: `2px solid ${GOLD}`, width: 360, textAlign: "center" }}>
         <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 8 }}>Editor Access</div>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 28 }}>Enter the edit password to continue.</div>
         <input
-          type="password"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && attempt()}
-          placeholder="Password"
-          autoFocus
-          style={{
-            width: "100%", padding: "10px 14px", fontSize: 14, borderRadius: 3,
+          type="password" value={input} onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && attempt()} placeholder="Password" autoFocus
+          style={{ width: "100%", padding: "10px 14px", fontSize: 14, borderRadius: 3,
             border: error ? "2px solid #e06060" : `2px solid ${GOLD}`,
             background: "#0d1829", color: "#fff", outline: "none",
-            fontFamily: body, boxSizing: "border-box", marginBottom: 12,
-            transition: "border 0.2s",
-          }}
+            fontFamily: body, boxSizing: "border-box", marginBottom: 12, transition: "border 0.2s" }}
         />
         {error && <div style={{ color: "#e06060", fontSize: 12, marginBottom: 10 }}>Incorrect password. Try again.</div>}
-        <button
-          onClick={attempt}
-          style={{ width: "100%", padding: "10px", background: GOLD, color: NAVY, border: "none", borderRadius: 3, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: body }}
-        >
+        <button onClick={attempt} style={{ width: "100%", padding: "10px", background: GOLD, color: NAVY, border: "none", borderRadius: 3, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: body }}>
           Unlock Editor
         </button>
       </div>
@@ -229,26 +200,12 @@ export default function App() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase
-      .from("card_data")
-      .select("data")
-      .eq("id", CARD_ID)
-      .single()
-      .then(({ data: row, error }) => {
-        if (!error && row?.data) setData(row.data);
-      });
-
-    const channel = supabase
-      .channel("card_data_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
-        (payload) => {
-          if (payload.new?.data) setData(payload.new.data);
-        }
-      )
+    supabase.from("card_data").select("data").eq("id", CARD_ID).single()
+      .then(({ data: row, error }) => { if (!error && row?.data) setData(row.data); });
+    const channel = supabase.channel("card_data_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
+        (payload) => { if (payload.new?.data) setData(payload.new.data); })
       .subscribe();
-
     return () => supabase.removeChannel(channel);
   }, []);
 
@@ -257,9 +214,7 @@ export default function App() {
     clearTimeout(saveTimer.current);
     setSyncStatus("saving");
     saveTimer.current = setTimeout(async () => {
-      const { error } = await supabase
-        .from("card_data")
-        .upsert({ id: CARD_ID, data: newData, updated_at: new Date().toISOString() });
+      const { error } = await supabase.from("card_data").upsert({ id: CARD_ID, data: newData, updated_at: new Date().toISOString() });
       setSyncStatus(error ? "error" : "saved");
       setTimeout(() => setSyncStatus("idle"), 2000);
     }, 800);
@@ -288,14 +243,7 @@ export default function App() {
 
   const addRow = () => {
     setData(prev => {
-      const next = {
-        ...prev,
-        rows: [...prev.rows, {
-          topic: "New Topic",
-          left: { text: "Enter record here.", bold: "" },
-          right: { text: "Enter commitment here.", bold: "" },
-        }]
-      };
+      const next = { ...prev, rows: [...prev.rows, { topic: "New Topic", left: { text: "Enter commitment here.", bold: "" }, right: { text: "Enter record here.", bold: "" } }] };
       saveToSupabase(next);
       return next;
     });
@@ -324,15 +272,9 @@ export default function App() {
   const LIGHT_NAVY_TEXT = "#DDD7CD";
   const GOLD_TAG = "#C8A84B";
   const LIGHT_BROWN = "#D0C9BC";
-
   const serif = '"Playfair Display", "Times New Roman", serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
-
-  const btnStyle = (bg, color) => ({
-    background: bg, color, border: `1px solid ${color}`,
-    padding: "6px 16px", borderRadius: 3, cursor: "pointer",
-    fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px",
-  });
+  const btnStyle = (bg, color) => ({ background: bg, color, border: `1px solid ${color}`, padding: "6px 16px", borderRadius: 3, cursor: "pointer", fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px" });
 
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
@@ -354,16 +296,10 @@ export default function App() {
               {syncStatus === "saving" ? "Saving..." : syncStatus === "saved" ? "Saved" : syncStatus === "error" ? "Save failed" : ""}
             </div>
           )}
-          {!supabase && (
-            <div style={{ fontSize: 11, color: "rgba(255,100,100,0.6)", fontFamily: body }}>
-              Supabase not connected. Edits are local only.
-            </div>
-          )}
+          {!supabase && <div style={{ fontSize: 11, color: "rgba(255,100,100,0.6)", fontFamily: body }}>Supabase not connected. Edits are local only.</div>}
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setEditMode(m => !m)} style={btnStyle("#333", "#aaa")}>
-            {editMode ? "Preview" : "Edit"}
-          </button>
+          <button onClick={() => setEditMode(m => !m)} style={btnStyle("#333", "#aaa")}>{editMode ? "Preview" : "Edit"}</button>
           <button onClick={addRow} style={btnStyle(NAVY, GOLD)}>+ Add Row</button>
           <button onClick={() => window.print()} style={btnStyle(GOLD, NAVY)}>Print / Save PDF</button>
         </div>
@@ -375,34 +311,34 @@ export default function App() {
           <Editable value={data.header.eyebrow} onChange={v => set("header.eyebrow", v)}
             style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }} />
           <Editable value={data.header.title} onChange={v => set("header.title", v)}
-            style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: WHITE, lineHeight: 1.2 }} />
+            style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: WHITE, lineHeight: 1.2, fontVariantLigatures: "none" }} />
           <Editable value={data.header.tagline} onChange={v => set("header.tagline", v)}
             style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }} />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-          <div style={{ background: TAN, borderBottom: `3px solid ${GOLD}`, borderRight: `4px solid ${NAVY}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+          <div style={{ background: TAN, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <PhotoSlot src={data.left.photo} onUpload={v => set("left.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.left.name} onChange={v => set("left.name", v)}
-                style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: "#2A2520", lineHeight: 1.1 }} />
+                style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: "#2A2520", lineHeight: 1.1, fontVariantLigatures: "none" }} />
               <Editable value={data.left.role} onChange={v => set("left.role", v)}
                 style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }} />
             </div>
           </div>
-          <div style={{ background: DARK_NAVY, borderBottom: `3px solid ${GOLD}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
+          <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <PhotoSlot src={data.right.photo} onUpload={v => set("right.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.right.name} onChange={v => set("right.name", v)}
-                style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: WHITE, lineHeight: 1.1 }} />
+                style={{ fontFamily: serif, fontSize: 28, fontWeight: 900, color: WHITE, lineHeight: 1.1, fontVariantLigatures: "none" }} />
               <Editable value={data.right.role} onChange={v => set("right.role", v)}
                 style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }} />
             </div>
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}` }}>
-          <div style={{ background: LIGHT_TAN, borderRight: `4px solid ${NAVY}`, padding: "7px 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+          <div style={{ background: LIGHT_TAN, padding: "7px 20px" }}>
             <Editable value={data.left.colHeader} onChange={v => set("left.colHeader", v)}
               style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }} />
           </div>
@@ -417,8 +353,8 @@ export default function App() {
           const leftBg = even ? LIGHT_TAN : CREAM;
           const rightBg = even ? MID_NAVY : NAVY;
           return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", position: "relative", borderBottom: `1px solid ${GOLD}` }}>
-              <div style={{ background: leftBg, borderRight: `4px solid ${NAVY}`, padding: "9px 20px" }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", position: "relative", borderBottom: `1px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
+              <div style={{ background: leftBg, padding: "9px 20px" }}>
                 <Editable value={row.topic} onChange={v => setRow(i, "topic", "topic", v)}
                   style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }} />
                 {editMode ? (
