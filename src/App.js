@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 
 const CARD_ID = "main";
 const EDIT_PASSWORD = process.env.REACT_APP_EDIT_PASSWORD || "";
+const SESSION_KEY = "lyman_editor_unlocked";
 
 const PHIL_DEFAULT = "/phil.jpeg";
 const MALOY_DEFAULT = "/maloy.jpeg";
@@ -165,8 +166,14 @@ function PasswordGate({ onUnlock }) {
   const NAVY = "#1C2B4A";
   const GOLD = "#C8A84B";
   const attempt = () => {
-    if (input === EDIT_PASSWORD) { onUnlock(); }
-    else { setError(true); setInput(""); setTimeout(() => setError(false), 2000); }
+    if (input === EDIT_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, "1");
+      onUnlock();
+    } else {
+      setError(true);
+      setInput("");
+      setTimeout(() => setError(false), 2000);
+    }
   };
   return (
     <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: body }}>
@@ -191,7 +198,7 @@ function PasswordGate({ onUnlock }) {
 }
 
 export default function App() {
-  const [unlocked, setUnlocked] = useState(!EDIT_PASSWORD);
+  const [unlocked, setUnlocked] = useState(() => !EDIT_PASSWORD || sessionStorage.getItem(SESSION_KEY) === "1");
   const [data, setData] = useState(DEFAULT_DATA);
   const [editMode, setEditMode] = useState(true);
   const [syncStatus, setSyncStatus] = useState("idle");
@@ -308,11 +315,11 @@ export default function App() {
 
         <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 28px" }}>
           <Editable value={data.header.eyebrow} onChange={v => set("header.eyebrow", v)}
-            style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }} />
+            style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4, display: "block" }} />
           <Editable value={data.header.title} onChange={v => set("header.title", v)}
-            style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: WHITE, lineHeight: 1.2 }} />
+            style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: WHITE, lineHeight: 1.2, display: "block" }} />
           <Editable value={data.header.tagline} onChange={v => set("header.tagline", v)}
-            style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }} />
+            style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4, display: "block" }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `3px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
@@ -320,18 +327,18 @@ export default function App() {
             <PhotoSlot src={data.left.photo} onUpload={v => set("left.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.left.name} onChange={v => set("left.name", v)}
-                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: "#2A2520", lineHeight: 1.1 }} />
+                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: "#2A2520", lineHeight: 1.1, display: "block" }} />
               <Editable value={data.left.role} onChange={v => set("left.role", v)}
-                style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }} />
+                style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4, display: "block" }} />
             </div>
           </div>
           <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <PhotoSlot src={data.right.photo} onUpload={v => set("right.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.right.name} onChange={v => set("right.name", v)}
-                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: WHITE, lineHeight: 1.1 }} />
+                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: WHITE, lineHeight: 1.1, display: "block" }} />
               <Editable value={data.right.role} onChange={v => set("right.role", v)}
-                style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }} />
+                style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4, display: "block" }} />
             </div>
           </div>
         </div>
@@ -339,11 +346,11 @@ export default function App() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `2px solid ${GOLD}`, columnGap: 4, background: NAVY }}>
           <div style={{ background: LIGHT_TAN, padding: "7px 20px" }}>
             <Editable value={data.left.colHeader} onChange={v => set("left.colHeader", v)}
-              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD }} />
+              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, display: "block" }} />
           </div>
           <div style={{ background: NAVY, padding: "7px 20px" }}>
             <Editable value={data.right.colHeader} onChange={v => set("right.colHeader", v)}
-              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A" }} />
+              style={{ fontFamily: body, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#8A3A2A", display: "block" }} />
           </div>
         </div>
 
@@ -358,7 +365,7 @@ export default function App() {
                   style={{ display: "inline-block", fontFamily: body, fontSize: 9, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", background: LIGHT_BROWN, color: "#5A4F47", padding: "1px 6px", marginBottom: 5, borderRadius: 2 }} />
                 {editMode ? (
                   <Editable value={row.left.text} onChange={v => setRow(i, "left", "text", v)} multiline
-                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }} />
+                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN, display: "block" }} />
                 ) : (
                   <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: DARK_BROWN }}>
                     <BoldText text={row.left.text} bold={row.left.bold} color={DARK_BROWN} boldColor={RED} />
@@ -378,7 +385,7 @@ export default function App() {
                 </div>
                 {editMode ? (
                   <Editable value={row.right.text} onChange={v => setRow(i, "right", "text", v)} multiline
-                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }} />
+                    style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT, display: "block" }} />
                 ) : (
                   <div style={{ fontFamily: body, fontSize: 12, lineHeight: 1.5, color: LIGHT_NAVY_TEXT }}>
                     <BoldText text={row.right.text} bold={row.right.bold} color={LIGHT_NAVY_TEXT} boldColor={GOLD_MUTED} />
@@ -404,9 +411,9 @@ export default function App() {
 
         <div style={{ background: NAVY, borderTop: `4px solid ${GOLD}`, padding: "10px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20 }}>
           <Editable value={data.footer} onChange={v => set("footer", v)} multiline
-            style={{ fontFamily: body, fontStyle: "italic", fontSize: 10, color: "rgba(255,255,255,0.35)", flex: 1 }} />
+            style={{ fontFamily: body, fontStyle: "italic", fontSize: 10, color: "rgba(255,255,255,0.35)", flex: 1, display: "block" }} />
           <Editable value={data.footerRight} onChange={v => set("footerRight", v)}
-            style={{ fontFamily: serif, fontSize: 12, fontWeight: 700, color: GOLD, textAlign: "right", whiteSpace: "nowrap" }} />
+            style={{ fontFamily: serif, fontSize: 12, fontWeight: 700, color: GOLD, textAlign: "right", whiteSpace: "nowrap", display: "block" }} />
         </div>
 
       </div>
