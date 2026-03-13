@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "./supabase";
 
-const CARD_ID = "main"; // single shared card
+const CARD_ID = "main";
+const EDIT_PASSWORD = process.env.REACT_APP_EDIT_PASSWORD || "";
 
 const PHIL_DEFAULT = "/phil.jpeg";
 const MALOY_DEFAULT = "/maloy.jpeg";
@@ -169,7 +170,58 @@ function PhotoSlot({ src, onUpload, style }) {
   );
 }
 
+function PasswordGate({ onUnlock }) {
+  const [input, setInput] = useState("");
+  const [error, setError] = useState(false);
+  const body = '"Source Serif 4", "Times New Roman", serif';
+  const serif = '"Playfair Display", "Times New Roman", serif';
+  const NAVY = "#1C2B4A";
+  const GOLD = "#C8A84B";
+
+  const attempt = () => {
+    if (input === EDIT_PASSWORD) {
+      onUnlock();
+    } else {
+      setError(true);
+      setInput("");
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: body }}>
+      <div style={{ background: NAVY, padding: "48px 40px", borderRadius: 6, boxShadow: "0 16px 64px rgba(0,0,0,0.6)", border: `2px solid ${GOLD}`, width: 360, textAlign: "center" }}>
+        <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 8 }}>Editor Access</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 28 }}>Enter the edit password to continue.</div>
+        <input
+          type="password"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && attempt()}
+          placeholder="Password"
+          autoFocus
+          style={{
+            width: "100%", padding: "10px 14px", fontSize: 14, borderRadius: 3,
+            border: error ? "2px solid #e06060" : `2px solid ${GOLD}`,
+            background: "#0d1829", color: "#fff", outline: "none",
+            fontFamily: body, boxSizing: "border-box", marginBottom: 12,
+            transition: "border 0.2s",
+          }}
+        />
+        {error && <div style={{ color: "#e06060", fontSize: 12, marginBottom: 10 }}>Incorrect password. Try again.</div>}
+        <button
+          onClick={attempt}
+          style={{ width: "100%", padding: "10px", background: GOLD, color: NAVY, border: "none", borderRadius: 3, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: body }}
+        >
+          Unlock Editor
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [unlocked, setUnlocked] = useState(!EDIT_PASSWORD);
   const [data, setData] = useState(DEFAULT_DATA);
   const [editMode, setEditMode] = useState(true);
   const [syncStatus, setSyncStatus] = useState("idle");
@@ -183,9 +235,7 @@ export default function App() {
       .eq("id", CARD_ID)
       .single()
       .then(({ data: row, error }) => {
-        if (!error && row?.data) {
-          setData(row.data);
-        }
+        if (!error && row?.data) setData(row.data);
       });
 
     const channel = supabase
@@ -194,9 +244,7 @@ export default function App() {
         "postgres_changes",
         { event: "*", schema: "public", table: "card_data", filter: `id=eq.${CARD_ID}` },
         (payload) => {
-          if (payload.new?.data) {
-            setData(payload.new.data);
-          }
+          if (payload.new?.data) setData(payload.new.data);
         }
       )
       .subscribe();
@@ -285,6 +333,8 @@ export default function App() {
     padding: "6px 16px", borderRadius: 3, cursor: "pointer",
     fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px",
   });
+
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#111", padding: "24px 16px", fontFamily: body }}>
