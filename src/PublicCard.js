@@ -80,17 +80,24 @@ function BoldText({ text, bold, color, boldColor }) {
 }
 
 export default function PublicCard() {
-  const [data, setData] = useState(DEFAULT_DATA);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setData(DEFAULT_DATA);
+      return;
+    }
     supabase
       .from("card_data")
       .select("data")
       .eq("id", CARD_ID)
       .single()
       .then(({ data: row, error }) => {
-        if (!error && row?.data) setData(row.data);
+        if (!error && row?.data) {
+          setData(row.data);
+        } else {
+          setData(DEFAULT_DATA);
+        }
       });
 
     const channel = supabase
@@ -125,6 +132,12 @@ export default function PublicCard() {
 
   const serif = '"Playfair Display", "Times New Roman", serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
+
+  if (!data) return (
+    <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ color: "rgba(255,255,255,0.3)", fontFamily: body, fontSize: 14 }}>Loading...</div>
+    </div>
+  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#111", padding: "24px 16px", fontFamily: body }}>
