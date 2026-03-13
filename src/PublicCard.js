@@ -110,7 +110,7 @@ export default function PublicCard() {
   const LIGHT_NAVY_TEXT = "#DDD7CD";
   const GOLD_TAG = "#C8A84B";
   const LIGHT_BROWN = "#D0C9BC";
-  const serif = '"Oswald", "Arial Narrow", sans-serif';
+  const serif = '"Times New Roman", Times, serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
 
   const download = async (format) => {
@@ -159,7 +159,7 @@ export default function PublicCard() {
 
         <div style={{ background: NAVY, borderBottom: `4px solid ${GOLD}`, padding: "14px 28px" }}>
           <div style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }}>{data.header.eyebrow}</div>
-          <div style={{ fontFamily: serif, fontSize: 24, fontWeight: 700, color: WHITE, lineHeight: 1.2, letterSpacing: "0.5px" }}>{data.header.title}</div>
+          <div style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: WHITE, lineHeight: 1.2 }}>{data.header.title}</div>
           <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }}>{data.header.tagline}</div>
         </div>
 
@@ -167,14 +167,14 @@ export default function PublicCard() {
           <div style={{ background: TAN, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.left.photo} alt={data.left.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 30, fontWeight: 700, color: "#2A2520", lineHeight: 1.1, letterSpacing: "0.5px" }}>{data.left.name}</div>
+              <div style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: "#2A2520", lineHeight: 1.1 }}>{data.left.name}</div>
               <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }}>{data.left.role}</div>
             </div>
           </div>
           <div style={{ background: DARK_NAVY, padding: "14px 20px", display: "flex", alignItems: "center", gap: 18 }}>
             <img src={data.right.photo} alt={data.right.name} style={{ width: 80, height: 96, objectFit: "cover", objectPosition: "top center", flexShrink: 0 }} />
             <div style={{ paddingLeft: 8 }}>
-              <div style={{ fontFamily: serif, fontSize: 30, fontWeight: 700, color: WHITE, lineHeight: 1.1, letterSpacing: "0.5px" }}>{data.right.name}</div>
+              <div style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: WHITE, lineHeight: 1.1 }}>{data.right.name}</div>
               <div style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }}>{data.right.role}</div>
             </div>
           </div>
