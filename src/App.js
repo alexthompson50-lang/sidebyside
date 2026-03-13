@@ -162,7 +162,7 @@ function PasswordGate({ onUnlock }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState(false);
   const body = '"Source Serif 4", "Times New Roman", serif';
-  const serif = '"Oswald", "Arial Narrow", sans-serif';
+  const serif = '"Times New Roman", Times, serif';
   const NAVY = "#1C2B4A";
   const GOLD = "#C8A84B";
   const attempt = () => {
@@ -172,7 +172,7 @@ function PasswordGate({ onUnlock }) {
   return (
     <div style={{ minHeight: "100vh", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: body }}>
       <div style={{ background: NAVY, padding: "48px 40px", borderRadius: 6, boxShadow: "0 16px 64px rgba(0,0,0,0.6)", border: `2px solid ${GOLD}`, width: 360, textAlign: "center" }}>
-        <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 8, letterSpacing: "0.5px" }}>Editor Access</div>
+        <div style={{ fontFamily: serif, fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Editor Access</div>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 28 }}>Enter the edit password to continue.</div>
         <input
           type="password" value={input} onChange={e => setInput(e.target.value)}
@@ -272,7 +272,7 @@ export default function App() {
   const LIGHT_NAVY_TEXT = "#DDD7CD";
   const GOLD_TAG = "#C8A84B";
   const LIGHT_BROWN = "#D0C9BC";
-  const serif = '"Oswald", "Arial Narrow", sans-serif';
+  const serif = '"Times New Roman", Times, serif';
   const body = '"Source Serif 4", "Times New Roman", serif';
   const btnStyle = (bg, color) => ({ background: bg, color, border: `1px solid ${color}`, padding: "6px 16px", borderRadius: 3, cursor: "pointer", fontSize: 12, fontFamily: body, fontWeight: 600, letterSpacing: "0.5px" });
 
@@ -311,7 +311,7 @@ export default function App() {
           <Editable value={data.header.eyebrow} onChange={v => set("header.eyebrow", v)}
             style={{ fontFamily: body, fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: GOLD, marginBottom: 4 }} />
           <Editable value={data.header.title} onChange={v => set("header.title", v)}
-            style={{ fontFamily: serif, fontSize: 24, fontWeight: 700, color: WHITE, lineHeight: 1.2, letterSpacing: "0.5px" }} />
+            style={{ fontFamily: serif, fontSize: 26, fontWeight: 700, color: WHITE, lineHeight: 1.2 }} />
           <Editable value={data.header.tagline} onChange={v => set("header.tagline", v)}
             style={{ fontFamily: body, fontStyle: "italic", fontSize: 13, color: "rgba(200,168,75,0.8)", marginTop: 4 }} />
         </div>
@@ -321,7 +321,7 @@ export default function App() {
             <PhotoSlot src={data.left.photo} onUpload={v => set("left.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.left.name} onChange={v => set("left.name", v)}
-                style={{ fontFamily: serif, fontSize: 30, fontWeight: 700, color: "#2A2520", lineHeight: 1.1, letterSpacing: "0.5px" }} />
+                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: "#2A2520", lineHeight: 1.1 }} />
               <Editable value={data.left.role} onChange={v => set("left.role", v)}
                 style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: MED_BROWN, marginTop: 4 }} />
             </div>
@@ -330,7 +330,7 @@ export default function App() {
             <PhotoSlot src={data.right.photo} onUpload={v => set("right.photo", v)} style={{ width: 80, height: 96 }} />
             <div style={{ paddingLeft: 8 }}>
               <Editable value={data.right.name} onChange={v => set("right.name", v)}
-                style={{ fontFamily: serif, fontSize: 30, fontWeight: 700, color: WHITE, lineHeight: 1.1, letterSpacing: "0.5px" }} />
+                style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: WHITE, lineHeight: 1.1 }} />
               <Editable value={data.right.role} onChange={v => set("right.role", v)}
                 style={{ fontFamily: body, fontStyle: "italic", fontSize: 12, color: GOLD, marginTop: 4 }} />
             </div>
